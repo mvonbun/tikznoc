@@ -41,7 +41,7 @@
 %</driver>
 % \fi
 % 
-% \CheckSum{669}
+% \CheckSum{783}
 % 
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -65,6 +65,9 @@
 % \changes{v1.2}{2019/03/18}{Add macro to connect routers by routes}
 % \changes{v1.3}{2019/03/27}{Add macro to connect routers by routes based on
 % router list}
+% \changes{v1.4}{2019/04/03}{Extend supported network size}
+% \changes{v1.5}{2019/06/17}{Add star version to tikznocRoute to connect tiles}
+% \changes{v1.6}{2019/06/17}{Add options to control the node number text}
 % 
 % \GetFileInfo{tikznoc.dtx}
 % 
@@ -143,12 +146,12 @@
 %
 % \clearpage
 % \noindent
-% \DescribeMacro{\tikznocRoute}
-% |\tikznocRoute|%
+% \DescribeMacro{\tikznocRoute} |\tikznocRoute|%
 % \oarg{route key-val}\oarg{tikz scope key-val}%
-% \marg{source-id}\oarg{source key-val}%
-% \marg{sink-id}\oarg{sink key-val}\\
-% Connect two routers via a route.
+% \marg{source-id}\oarg{*}\oarg{source key-val}%
+% \marg{sink-id}\oarg{*}\oarg{sink key-val}\\
+% Connect two routers via a route. If the star (*) variant is used, it adds a
+% connection to the tiles (source and sink separately) attached as well.
 %
 % \noindent
 % \DescribeMacro{\tikznocPath} |\tikznocRoute|%
@@ -235,6 +238,15 @@
 % Main option / interface macro.
 % The list of keys is
 % \xkvview{family=ctrl}
+%
+% A note on the number style controls (\texttt{numberSize, numberFont}), the
+% well-known standard \LaTeX\ sizes (\emph{tiny, scriptsize, footnotesize, small,
+% normalsize, large, Large, LARGE, huge, Huge}) and fonts (\emph{emph, textrm,
+% textsf, texttt, textup, textit, textsl, textsc, uppercase, textbf, textmd,
+% textlf}) are supported as keys (not commands!).  So, to get tiny bold numbers,
+% use:\\
+% |\tikznocset{numberSize=tiny,numberFont=textbf}|.
+% 
 % 
 % \clearpage
 % \section{Package Usage Example Gallery}%
@@ -346,6 +358,30 @@
 % |\begin{tikzpicture}[thick]%| \\
 % |  \tikznocset{tile}| \\
 % |  \tikznoc{3}{3}| \\
+% |\end{tikzpicture}| 
+% \end{minipage}\\[2ex]
+% 
+%
+% \noindent
+% \DescribeMacro{\tikznoc}
+% \DescribeMacro{\tikznocset}
+% \DescribeMacro{\tikznocRoute}
+% \begin{minipage}[t]{.3\linewidth}
+% Figure:\\[2ex]
+% \begin{tikzpicture}[thick]%
+%   \tikznocset{tile}
+%   \tikznoc{3}{3}
+%   \tikznocRoute[xy][teal]{00}*[below left]{11}
+%   \tikznocRoute[xy][lime]{20}*{22}*
+% \end{tikzpicture}
+% \end{minipage}\hfill
+% \begin{minipage}[t]{.7\linewidth}
+% Code:\\[2ex]
+% |\begin{tikzpicture}[thick]%| \\
+% |  \tikznocset{tile}| \\
+% |  \tikznoc{3}{3}| \\
+% |  \tikznocRoute[xy][teal]{00}*[below left]{11}| \\
+% |  \tikznocRoute[xy][lime]{20}*{22}*| \\
 % |\end{tikzpicture}| 
 % \end{minipage}\\[2ex]
 % 
@@ -810,6 +846,12 @@
 \define@cmdkeys[tikznoc]{ctrl}{numRow,numCol}%
 %    \end{macrocode}
 % 
+% Global router number seperator.
+%    \begin{macrocode}
+\define@cmdkeys[tikznoc]{ctrl}{numSep}%
+\setkeys[tikznoc]{ctrl}{numSep={}}%
+%    \end{macrocode}
+% 
 % 
 % Assign default here, thus the link macro does not use an undefined macro.
 %    \begin{macrocode}
@@ -887,15 +929,16 @@
 % Syntax: |\tikznoc|\oarg{tikzKey=Val}\marg{r}\marg{c}
 % \begin{macro}{\tikznoc}
 %    \begin{macrocode}
-\newcommand{\tikznoc}[3][]{%
+\DeclareDocumentCommand{\tikznoc}{ O{} m O{\cmdtikznoc@ctrl@numSep} m }{%
 %    \end{macrocode}
 % 
 % Check if both arguments are numbers and greater than 0,
 % 0 rows or columns are nonsense. If so, first store their values.
 %    \begin{macrocode}
-\ifthenelse{#2=0 \OR #3=0}{}{%
+\ifthenelse{#2=0 \OR #4=0}{}{%
 \def\tikznoc@global@numrow{#2}%
-\def\tikznoc@global@numcol{#3}%
+\def\tikznoc@global@numcol{#4}%
+\def\tikznoc@global@numsep{#3}%
 %    \end{macrocode}
 % 
 % Next check for optional input and set the options accordingly. Unknown
@@ -923,7 +966,7 @@
 % Start two TeX loops going from 0 to numRows-1 / numCols-1.
 %    \begin{macrocode}
 \whiledo{\the\tikznocNumberOfRows < #2}{%
-  \whiledo{\the\tikznocNumberOfColumns < #3}{%
+  \whiledo{\the\tikznocNumberOfColumns < #4}{%
 %    \end{macrocode}
 % 
 % Increase the router number.
@@ -954,16 +997,16 @@
 % However, use these coordinates to draw locally only at the current router.
 %    \begin{macrocode}
       \path (\the\tikznocNumberOfColumns,-\the\tikznocNumberOfRows) %
-        ++( 0.25, 0.25) coordinate[alias=useC]  (r\the\tikznocNumberOfRows\the\tikznocNumberOfColumns c);%
+        ++( 0.25, 0.25) coordinate[alias=useC]  (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns c);%
       \path (\the\tikznocNumberOfColumns,-\the\tikznocNumberOfRows) %
-                        coordinate[alias=useSW] (r\the\tikznocNumberOfRows\the\tikznocNumberOfColumns sw)%
-        ++( 0.25,    0) coordinate[alias=useS]  (r\the\tikznocNumberOfRows\the\tikznocNumberOfColumns s)%
-        ++( 0.25,    0) coordinate[alias=useSE] (r\the\tikznocNumberOfRows\the\tikznocNumberOfColumns se)%
-        ++( 0   , 0.25) coordinate[alias=useE]  (r\the\tikznocNumberOfRows\the\tikznocNumberOfColumns e)%
-        ++( 0   , 0.25) coordinate[alias=useNE] (r\the\tikznocNumberOfRows\the\tikznocNumberOfColumns ne)%
-        ++(-0.25,    0) coordinate[alias=useN]  (r\the\tikznocNumberOfRows\the\tikznocNumberOfColumns n)%
-        ++(-0.25,    0) coordinate[alias=useNW] (r\the\tikznocNumberOfRows\the\tikznocNumberOfColumns nw)%
-        ++( 0   ,-0.25) coordinate[alias=useW]  (r\the\tikznocNumberOfRows\the\tikznocNumberOfColumns w)%
+                        coordinate[alias=useSW] (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns sw)%
+        ++( 0.25,    0) coordinate[alias=useS]  (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns s)%
+        ++( 0.25,    0) coordinate[alias=useSE] (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns se)%
+        ++( 0   , 0.25) coordinate[alias=useE]  (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns e)%
+        ++( 0   , 0.25) coordinate[alias=useNE] (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns ne)%
+        ++(-0.25,    0) coordinate[alias=useN]  (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns n)%
+        ++(-0.25,    0) coordinate[alias=useNW] (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns nw)%
+        ++( 0   ,-0.25) coordinate[alias=useW]  (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns w)%
       ;%
 %    \end{macrocode}
 % 
@@ -974,7 +1017,7 @@
 % 
 % Print router ids at the center if boolean is true.
 %    \begin{macrocode}
-  \tikznocprintid{\the\tikznocNumberOfRows\the\tikznocNumberOfColumns}%
+  \tikznocprintid{\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns}%
 %    \end{macrocode}
 % 
 % Print router ids at the center if boolean is true. %FIXME: put in own macro
@@ -1009,10 +1052,10 @@
 %    \begin{macrocode}
       \iftikznoc@ctrl@link
          \ifnum\the\tikznocNumberOfRows>0
-            \tikznoclink{\the\tikznocNumberOfRows\the\tikznocNumberOfColumns}{N}%
+            \tikznoclink{\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns}{N}%
          \fi
          \ifnum\the\tikznocNumberOfColumns>0
-            \tikznoclink{\the\tikznocNumberOfRows\the\tikznocNumberOfColumns}{W}%
+            \tikznoclink{\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns}{W}%
          \fi
       \fi
 %    \end{macrocode}
@@ -1021,7 +1064,7 @@
 % Draw the tiles.
 %    \begin{macrocode}
 \iftikznoc@ctrl@tile
-  \tikznoctile{\the\tikznocNumberOfRows\the\tikznocNumberOfColumns}%
+  \tikznoctile{\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns}%
 \fi
 %    \end{macrocode}
 % 
@@ -1174,7 +1217,9 @@
 % Syntax: |\tikznocidtonum|\oarg{offset}\marg{router index}\marg{number macro name}
 % \begin{macro}{\tikznocidtonum}
 %    \begin{macrocode}
-\newcommand{\tikznocidtonum}[3][1]{%
+\newcount\tikznoc@numbers@start@value
+\define@key[tikznoc]{ctrl}{numbersStartAt}[0]{\tikznoc@numbers@start@value=#1}%
+\newcommand{\tikznocidtonum}[3][0]{%
 %    \end{macrocode}
 % Split the router id into row and column indices. 
 %    \begin{macrocode}
@@ -1186,11 +1231,12 @@
 \tikznoc@idtonum@cntA=\tikznoc@global@numcol
 \multiply\tikznoc@idtonum@cntA by \tikznoc@idtonum@row
 \advance\tikznoc@idtonum@cntA by \tikznoc@idtonum@col
+\advance\tikznoc@idtonum@cntA by \tikznoc@numbers@start@value
 \advance\tikznoc@idtonum@cntA by #1
 %    \end{macrocode}
 % Assign the number to the macro name requested.
 %    \begin{macrocode}
-\expandafter\edef\csname #3\endcsname{\the\tikznoc@idtonum@cntA}%
+\expandafter\edef\csname #3\endcsname{\the\tikznoc@idtonum@cntA}%\tikznoc@ctrl@numberFormat
 }%
 %    \end{macrocode}
 % \end{macro}
@@ -1249,6 +1295,31 @@
 % ID printing.\\
 % Syntax: |\tikznocprintid|\oarg{}\marg{router index}
 % \begin{macro}{\tikznocprintid}
+% Define number text style options as passing the commands directly did not
+% work.
+%
+% The text size goes first.
+%    \begin{macrocode}
+\define@choicekey+[tikznoc]{ctrl}{numberSize}[\val\nr]{%
+  tiny,scriptsize,footnotesize,small,normalsize,%
+  large,Large,LARGE,huge,Huge}%
+[normalsize]{\edef\tikznoc@numberSize{\nr}}{%
+  \PackageWarning{tikznoc}{Unknown text size.}\edef\tikznoc@numberSize{4}}%
+%    \end{macrocode}
+% Then the font.
+%    \begin{macrocode}
+\define@choicekey+[tikznoc]{ctrl}{numberFont}[\val\nr]{%
+  textnormal,emph,textrm,textsf,texttt,textup,%
+  textit,textsl,textsc,uppercase,textbf,textmd,textlf}%
+[textnormal]{\edef\tikznoc@numberFont{\nr}}{%
+  \PackageWarning{tikznoc}{Unknown text font.}\edef\tikznoc@numberFont{0}}%
+%    \end{macrocode}
+% Finally, set the default using |\tikznocset|.
+%    \begin{macrocode}
+\tikznocset{numbersStartAt,numberSize,numberFont}%
+%    \end{macrocode}
+%
+% Start the print id macro definition.
 %    \begin{macrocode}
 \newcommand{\tikznocprintid}[2][0]{%
 \ifthenelse{\equal{#2}{reprint}}{%
@@ -1265,12 +1336,41 @@
     \tikznoc@printid@col=#1
 }%
 }{%
+%    \end{macrocode}
+% Show the node id (row/column).
+%    \begin{macrocode}
   \iftikznoc@ctrl@showid
     \path (r#2c) node {#2};%
   \fi
+%    \end{macrocode}
+% Show a node number. First retrieve it from the node id.
+%    \begin{macrocode}
   \iftikznoc@ctrl@shownumber
     \tikznocidtonum{#2}{tikznoc@printid@nodetext}%
-    \path (r#2c) node {\tikznoc@printid@nodetext};%
+%    \end{macrocode}
+% Then apply the options (font size and font family).
+%    \begin{macrocode}
+    \path (r#2c) node {{%
+      \ifcase\tikznoc@numberSize\relax
+        \tiny\or\scriptsize\or\footnotesize\or\small\or\normalsize\or%
+        \large\or\Large\or\LARGE\or\huge\or\Huge%
+      \fi
+      \ifcase\tikznoc@numberFont\relax
+        \tikznoc@printid@nodetext
+        \or\emph{\tikznoc@printid@nodetext}%
+        \or\textrm{\tikznoc@printid@nodetext}%
+        \or\textsf{\tikznoc@printid@nodetext}%
+        \or\texttt{\tikznoc@printid@nodetext}%
+        \or\textup{\tikznoc@printid@nodetext}%
+        \or\textit{\tikznoc@printid@nodetext}%
+        \or\textsl{\tikznoc@printid@nodetext}%
+        \or\textsc{\tikznoc@printid@nodetext}%
+        \or\uppercase{\tikznoc@printid@nodetext}%
+        \or\textbf{\tikznoc@printid@nodetext}%
+        \or\textmd{\tikznoc@printid@nodetext}%
+        \or\textlf{\tikznoc@printid@nodetext}%
+      \fi
+    }};%
   \fi
 }
 }%
@@ -1407,8 +1507,8 @@
 % Macro to connect two routers by a route.\\
 % Syntax: |\tikznocRoute|%
 % \oarg{route key-val}\oarg{tikz scope key-val}%
-% \marg{source-id}\oarg{source key-val}%
-% \marg{sink-id}\oarg{sink key-val}
+% \marg{source-id}\oarg{*}\oarg{source key-val}%
+% \marg{sink-id}\oarg{*}\oarg{sink key-val}
 % \begin{macro}{\tikznocRoute}
 % Define style used for connecting routers.
 %    \begin{macrocode}
@@ -1551,7 +1651,7 @@
 % 
 % Connection route macro.
 %    \begin{macrocode}
-\DeclareDocumentCommand{\tikznocRoute}{ o O{} m o m o }{%
+\DeclareDocumentCommand{\tikznocRoute}{ o O{} m s o m s o }{%
 %    \end{macrocode}
 % Assign defaults.
 %    \begin{macrocode}
@@ -1560,26 +1660,41 @@
 %  Process user inputs.  Start with global arguments
 %    \begin{macrocode}
   \IfNoValueTF{#1}{}{\setkeys[tikznoc]{route}{#1}}%
-  \IfNoValueTF{#4}{}{\setkeys[tikznoc]{routeSource}{#4}}%
-  \IfNoValueTF{#6}{}{\setkeys[tikznoc]{routeSink}{#6}}%
+  \IfNoValueTF{#5}{}{\setkeys[tikznoc]{routeSource}{#5}}%
+  \IfNoValueTF{#8}{}{\setkeys[tikznoc]{routeSink}{#8}}%
 %    \end{macrocode}
-% Define alias coordinates used to connect.
+% Define alias coordinates for the routers used to connect.
 %    \begin{macrocode}
   \path (r#3c) ++ (\tikznoc@route@sourceoffset) coordinate (tikznocRouteFrom);%
-  \path (r#5c) ++ (\tikznoc@route@sinkoffset) coordinate (tikznocRouteTo);%
+  \path (r#6c) ++ (\tikznoc@route@sinkoffset) coordinate (tikznocRouteTo);%  
 %    \end{macrocode}
-% Switch between the three connection styles.
+% Define alias coordinates for the tiles based on the star options.
+% The star variants use the same offset for the tiles as for the routers.
+%    \begin{macrocode}
+\IfBooleanTF{#4}{%
+  \path (t#3.center) ++ (\tikznoc@route@sourceoffset) coordinate (tikznocRouteFromTile);%
+}{}%
+\IfBooleanTF{#7}{%
+  \path (t#6.center) ++ (\tikznoc@route@sinkoffset) coordinate (tikznocRouteToTile);% 
+}{}%
+%    \end{macrocode}
+% Switch between the three connection styles.  If star variant, make a straight
+% connection to the router coordinates first (and last).
 %    \begin{macrocode}
   \begin{scope}[#2]%
-    \iftikznoc@route@style@xy
-      \draw[route] (tikznocRouteFrom) -| (tikznocRouteTo);%
-    \fi
-    \iftikznoc@route@style@yx
-      \draw[route] (tikznocRouteFrom) |- (tikznocRouteTo);%
-    \fi
-    \iftikznoc@route@style@direct
-      \draw[route] (tikznocRouteFrom) -- (tikznocRouteTo);%
-    \fi
+    \draw[route]
+      \IfBooleanTF{#4}{(tikznocRouteFromTile) --}{}%
+      \iftikznoc@route@style@xy
+         (tikznocRouteFrom) -| (tikznocRouteTo)%
+      \fi
+      \iftikznoc@route@style@yx
+         (tikznocRouteFrom) |- (tikznocRouteTo)%
+      \fi
+      \iftikznoc@route@style@direct
+        (tikznocRouteFrom) -- (tikznocRouteTo)%
+      \fi
+      \IfBooleanTF{#7}{-- (tikznocRouteToTile)}{}%
+    ;%
   \end{scope}
 }%
 %    \end{macrocode}
