@@ -41,7 +41,7 @@
 %</driver>
 % \fi
 % 
-% \CheckSum{783}
+% \CheckSum{846}
 % 
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -68,6 +68,7 @@
 % \changes{v1.4}{2019/04/03}{Extend supported network size}
 % \changes{v1.5}{2019/06/17}{Add star version to tikznocRoute to connect tiles}
 % \changes{v1.6}{2019/06/17}{Add options to control the node number text}
+% \changes{v1.7}{2019/07/15}{Add option to have edge numbers}
 % 
 % \GetFileInfo{tikznoc.dtx}
 % 
@@ -427,6 +428,26 @@
 % |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
 % 
+%
+% \noindent
+% \DescribeMacro{\tikznoc}
+% \DescribeMacro{enumEdges}
+% \begin{minipage}[t]{0.3\textwidth}%
+% Figure:\\[2ex]
+% \begin{tikzpicture}[thick]%
+%   \tikznocset{enumEdges}
+%   \tikznoc{3}{3}
+% \end{tikzpicture}\\
+% \end{minipage}
+% \hfill
+% \begin{minipage}[t]{0.7\textwidth}%
+% Code:\\[2ex]
+% |\begin{tikzpicture}[thick]%| \\
+%   | \tikznocset{enumEdges}| \\
+%   |  \tikznoc{3}{3}| \\
+% |\end{tikzpicture}|
+% \end{minipage}\\[2ex]
+%
 % 
 % \noindent
 % \DescribeMacro{\tikznoc}
@@ -820,7 +841,7 @@
 % |connectTile| controls if tiles are connected to the routers.\\
 %    \begin{macrocode}
 \define@boolkeys[tikznoc]{ctrl}{router,showid,shownumber,portnames}[true]%
-\define@boolkeys[tikznoc]{ctrl}{link,doubleEdges}[true]%
+\define@boolkeys[tikznoc]{ctrl}{link,doubleEdges,enumEdges}[true]%
 \define@boolkeys[tikznoc]{ctrl}{tile,connectTile}[true]%
 %    \end{macrocode}
 % 
@@ -868,7 +889,7 @@
 % Set defaults here, i.e. only set drawing of routers and links to be <true> by default
 % (conditionals are always intialized <false>)
 %    \begin{macrocode}
-\setkeys[tikznoc]{ctrl}{router,link,connectTile}%
+\setkeys[tikznoc]{ctrl}{router,link,connectTile,enumEdges=false}%
 %    \end{macrocode}
 % 
 % Provide basic interface macro.
@@ -889,6 +910,7 @@
 \DeclareOption{norouter}{\setkeys[tikznoc]{ctrl}{router=false}}%
 \DeclareOption{nolink}{\setkeys[tikznoc]{ctrl}{link=false}}%
 \DeclareOption{doubleEdges}{\setkeys[tikznoc]{ctrl}{doubleEdges=true}}%
+\DeclareOption{enumEdges}{\setkeys[tikznoc]{ctrl}{enumEdges=true}}%
 \DeclareOption{tightEdges}{\setkeys[tikznoc]{ctrl}{edgeStyle=tight}}%
 \DeclareOption{looseEdges}{\setkeys[tikznoc]{ctrl}{edgeStyle=loose}}%
 \DeclareOption{tile}{\setkeys[tikznoc]{ctrl}{tile=true}}%
@@ -911,10 +933,11 @@
 \newcount\tikznoclinkToColumnIndex%
 %    \end{macrocode}
 % 
-% Define linear index counters for routers and links macro.
+% Define linear index counters for routers, links, and edge macro.
 %    \begin{macrocode}
 \newcount\tikznocRouterNumber\tikznocRouterNumber=0%
 \newcount\tikznocLinkNumber\tikznocLinkNumber=0%
+\newcount\tikznocEdgeNumber\tikznocEdgeNumber=0%
 %    \end{macrocode}
 % 
 % Internal interface macro for easy access to all routers.
@@ -951,11 +974,15 @@
 % \tikzset{tikznocScopeCommand/.style={\XKV@rm}}%
 %    \end{macrocode}
 % 
-% Reset the router counters for row, column, and number.
+% Reset the router counters for row, column, and number. Optionally, also reset
+% the edge number counter.
 %    \begin{macrocode}
 \tikznocNumberOfRows=0%
 \tikznocNumberOfColumns=0%
 \tikznocRouterNumber=0%
+\iftikznoc@ctrl@enumEdges
+  \tikznocEdgeNumber=0%
+\fi
 %    \end{macrocode}
 % 
 % Enclose the noc in its own scope.
@@ -1020,27 +1047,21 @@
   \tikznocprintid{\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns}%
 %    \end{macrocode}
 % 
-% Print router ids at the center if boolean is true. %FIXME: put in own macro
-%    \begin{macrocode}
-
-%    \end{macrocode}
-% 
-% 
 % Print port names if boolean is true. % FIXME: put in own macro
 %    \begin{macrocode}
-        % show router coord
-      \iftikznoc@ctrl@portnames
-        \path (useC)  node              {C}%
-              (useSW) node[below left]  {SW}%
-              (useS)  node[below]       {S}%
-              (useSE) node[below right] {SE}%
-              (useE)  node[right]       {E}%
-              (useNE) node[above right] {NE}%
-              (useN)  node[above]       {N}%
-              (useNW) node[above left]  {NW}%
-              (useW)  node[left]        {W}%
-        ;
-      \fi
+\iftikznoc@ctrl@portnames
+  \path 
+    (useC)  node              {C}%
+    (useSW) node[below left]  {SW}%
+    (useS)  node[below]       {S}%
+    (useSE) node[below right] {SE}%
+    (useE)  node[right]       {E}%
+    (useNE) node[above right] {NE}%
+    (useN)  node[above]       {N}%
+    (useNW) node[above left]  {NW}%
+    (useW)  node[left]        {W}%
+  ;
+\fi
 %    \end{macrocode}
 % 
 % 
@@ -1125,6 +1146,8 @@
   \def\tikznoclinkToPort{s}%
   \def\tikznoclinkOffsetTop{left}%
   \def\tikznoclinkOffsetBot{right}%
+  \def\tikznocEdgeLabelOffsetX{0.75}%
+  \def\tikznocEdgeLabelOffsetY{0}%
 }{}%
 \ifthenelse{\equal{#3}{E}}{%
   \advance\tikznoclinkToColumnIndex by 1
@@ -1132,6 +1155,8 @@
   \def\tikznoclinkToPort{w}%
   \def\tikznoclinkOffsetTop{above}%
   \def\tikznoclinkOffsetBot{below}%
+  \def\tikznocEdgeLabelOffsetX{0}%
+  \def\tikznocEdgeLabelOffsetY{0.75}%
 }{}%
 \ifthenelse{\equal{#3}{S}}{%
   \advance\tikznoclinkToRowIndex by 1
@@ -1139,6 +1164,8 @@
   \def\tikznoclinkToPort{n}%
   \def\tikznoclinkOffsetTop{right}%
   \def\tikznoclinkOffsetBot{left}%
+  \def\tikznocEdgeLabelOffsetX{0.75}%
+  \def\tikznocEdgeLabelOffsetY{0}%
 }{}%
 \ifthenelse{\equal{#3}{W}}{%
   \advance\tikznoclinkToColumnIndex by -1
@@ -1146,6 +1173,8 @@
   \def\tikznoclinkToPort{e}%
   \def\tikznoclinkOffsetTop{below}%
   \def\tikznoclinkOffsetBot{above}%
+  \def\tikznocEdgeLabelOffsetX{0}%
+  \def\tikznocEdgeLabelOffsetY{0.75}%
 }{}%
 %    \end{macrocode}
 % 
@@ -1159,8 +1188,19 @@
     (r\the\tikznoclinkToRowIndex\the\tikznoclinkToColumnIndex\tikznoclinkToPort) node[\tikznoclinkOffsetTop] (tt) {}%
     (r\the\tikznoclinkToRowIndex\the\tikznoclinkToColumnIndex\tikznoclinkToPort) node[\tikznoclinkOffsetBot] (tb) {}%
   ;%
-  \draw[->] (ft\tikznoc@ctrl@cmd@edgeStyle) -- (tt\tikznoc@ctrl@cmd@edgeStyle);%
-  \draw[<-] (fb\tikznoc@ctrl@cmd@edgeStyle) -- (tb\tikznoc@ctrl@cmd@edgeStyle);%
+  \iftikznoc@ctrl@enumEdges
+    \draw[->] (ft\tikznoc@ctrl@cmd@edgeStyle) --
+      node[xshift=\tikznocEdgeLabelOffsetX ex, yshift=\tikznocEdgeLabelOffsetY ex]
+      {\scriptsize\the\tikznocEdgeNumber} (tt\tikznoc@ctrl@cmd@edgeStyle);%
+    \advance\tikznocEdgeNumber 1\relax%
+    \draw[<-] (fb\tikznoc@ctrl@cmd@edgeStyle) --
+      node[xshift=-\tikznocEdgeLabelOffsetX ex, yshift=-\tikznocEdgeLabelOffsetY ex]
+      {\scriptsize\the\tikznocEdgeNumber} (tb\tikznoc@ctrl@cmd@edgeStyle);%
+    \advance\tikznocEdgeNumber 1\relax%
+  \else
+    \draw[->] (ft\tikznoc@ctrl@cmd@edgeStyle) -- (tt\tikznoc@ctrl@cmd@edgeStyle);%
+    \draw[<-] (fb\tikznoc@ctrl@cmd@edgeStyle) -- (tb\tikznoc@ctrl@cmd@edgeStyle);%
+  \fi
 \else
 %    \end{macrocode}
 % 
@@ -1168,8 +1208,15 @@
 %    \begin{macrocode}
   \path (r\tikznoclinkFromRowIndex\tikznoclinkFromColumnIndex\tikznoclinkFromPort) node (from) {}%
     (r\the\tikznoclinkToRowIndex\the\tikznoclinkToColumnIndex\tikznoclinkToPort) node (to) {};%
-  \draw (from\tikznoc@ctrl@cmd@edgeStyle) -- (to\tikznoc@ctrl@cmd@edgeStyle);%
+  \iftikznoc@ctrl@enumEdges
+    \draw (from\tikznoc@ctrl@cmd@edgeStyle) --
+      node[xshift=\tikznocEdgeLabelOffsetX ex, yshift=\tikznocEdgeLabelOffsetY ex]
+      {\scriptsize\the\tikznocEdgeNumber} (to\tikznoc@ctrl@cmd@edgeStyle);%
+    \advance\tikznocEdgeNumber 1\relax%
+  \else
+    \draw (from\tikznoc@ctrl@cmd@edgeStyle) -- (to\tikznoc@ctrl@cmd@edgeStyle);%
   \fi
+\fi
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1749,7 +1796,9 @@
 % \section{To Do}%
 % \begin{itemize}
 %   \item Maybe change the rectangle router generation using nodes
-%   (and styles) instead of hard-coded rectangles
+%     (and styles) instead of hard-coded rectangles
+%   \item Make the edge numbers more modular with options controlling their
+%     style
 % \end{itemize}
 % 
 % 
