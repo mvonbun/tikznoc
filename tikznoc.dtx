@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<package>\ProvidesPackage{tikznoc}
 %<*package>
-    [2014/08/01 v1.0 draw 2d mesh nocs using tikz]
+    [2021/03/10 v1.8 Draw 2d mesh NoCs using TikZ]
 %</package>
 %
 %<*driver>
@@ -41,7 +41,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{849}
+% \CheckSum{899}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -106,7 +106,7 @@
 % \section{Macros Provided}%
 % \subsection{Main Macros}%
 % \DescribeMacro{\tikznoc}
-% |\tikznoc|\oarg{tikzKey=Val}\marg{$m$}\marg{$n$}\\
+% |\tikznoc|\textless\meta{tikznocKey=Val}\textgreater\oarg{tikzKey=Val}\marg{$m$}\marg{$n$}\\
 % Draw an $m$-by-$n$ 2D-mesh, where $m$ and $n$ are the number of rows
 % and columns of the 2D-mesh NoC.
 %
@@ -518,6 +518,26 @@
 % |  \tikznoclink{00}{S}| \\
 % |  \tikznoclink{11}{W}| \\
 % |\end{tikzpicture}|
+% \end{minipage}\\
+%
+%
+% \noindent
+% \DescribeMacro{\tikznoc}
+% \DescribeMacro{\tikznocset}
+% \begin{minipage}[t]{0.3\textwidth}%
+% Figure:\\[2ex]
+% \begin{tikzpicture}[thick]%
+%   \tikznocset{colSepScale=1.5, widthScale=1.25}
+%   \tikznoc<rowSepScale=0.75, heightScale=0.75>{2}{2}
+% \end{tikzpicture}
+% \end{minipage}
+% \hfill
+% \begin{minipage}[t]{0.7\textwidth}%
+% Code:\\[2ex]
+% |\begin{tikzpicture}[thick]%| \\
+% |  \tikznocset{colSepScale=1.5, widthScale=1.25}| \\
+% |  \tikznoc<rowSepScale=0.75, heightScale=0.75>{2}{2}| \\
+% |\end{tikzpicture}|
 % \end{minipage}
 %
 %
@@ -882,12 +902,25 @@
 %    \end{macrocode}
 %
 %
-% Add options for scaling the router distance.
-% First are scaling factors for the rows and columns. Also set their defaults.
+% Add options for scaling.
+% First are scaling factors the router distance, i.e. the rows and columns. Also
+% set their defaults.
 %    \begin{macrocode}
 \define@cmdkey[tikznoc]{ctrl}{rowSepScale}[1]{}%
 \define@cmdkey[tikznoc]{ctrl}{colSepScale}[1]{}%
-\setkeys[tikznoc]{ctrl}{rowSepScale,colSepScale}%
+\define@cmdkey[tikznoc]{ctrl}{sepScale}[1]{\setkeys[tikznoc]{ctrl}{rowSepScale=#1,colSepScale=#1}}%
+\setkeys[tikznoc]{ctrl}{sepScale}%
+%    \end{macrocode}
+%
+% Next is the router size. Also set their defaults.
+%    \begin{macrocode}
+\define@cmdkey[tikznoc]{ctrl}{width}[0.5]{}%
+\define@cmdkey[tikznoc]{ctrl}{height}[0.5]{}%
+\define@cmdkey[tikznoc]{ctrl}{size}[0.5]{\setkeys[tikznoc]{ctrl}{width=#1,height=#1}}%
+\define@cmdkey[tikznoc]{ctrl}{widthScale}[1]{}%
+\define@cmdkey[tikznoc]{ctrl}{heightScale}[1]{}%
+\define@cmdkey[tikznoc]{ctrl}{sizeScale}[1]{\setkeys[tikznoc]{ctrl}{widthScale=#1,heightScale=#1}}%
+\setkeys[tikznoc]{ctrl}{size,sizeScale}%
 %    \end{macrocode}
 %
 %
@@ -963,16 +996,31 @@
 % Syntax: |\tikznoc|\oarg{tikzKey=Val}\marg{r}\marg{c}
 % \begin{macro}{\tikznoc}
 %    \begin{macrocode}
-\DeclareDocumentCommand{\tikznoc}{ O{} m O{\cmdtikznoc@ctrl@numSep} m }{%
+\DeclareDocumentCommand{\tikznoc}{ d<> O{} m O{\cmdtikznoc@ctrl@numSep} m }{%
+%    \end{macrocode}
+%
+% Add option interface.
+%    \begin{macrocode}
+\IfNoValueF{#1}{\setkeys[tikznoc]{ctrl}{#1}}%
+%    \end{macrocode}
+%
+% Define some aliases.
+%    \begin{macrocode}
+\def\tikznoc@width{\cmdtikznoc@ctrl@widthScale*\cmdtikznoc@ctrl@width}%
+\def\tikznoc@height{\cmdtikznoc@ctrl@heightScale*\cmdtikznoc@ctrl@height}%
+\def\tikznoc@halfWidth{0.5*\tikznoc@width}%
+\def\tikznoc@halfHeight{0.5*\tikznoc@height}%
+\def\tikznoc@colSep{\cmdtikznoc@ctrl@colSepScale}%
+\def\tikznoc@rowSep{\cmdtikznoc@ctrl@rowSepScale}%
 %    \end{macrocode}
 %
 % Check if both arguments are numbers and greater than 0,
 % 0 rows or columns are nonsense. If so, first store their values.
 %    \begin{macrocode}
-\ifthenelse{#2=0 \OR #4=0}{}{%
-\def\tikznoc@global@numrow{#2}%
-\def\tikznoc@global@numcol{#4}%
-\def\tikznoc@global@numsep{#3}%
+\ifthenelse{#3=0 \OR #5=0}{}{%
+\def\tikznoc@global@numrow{#3}%
+\def\tikznoc@global@numcol{#5}%
+\def\tikznoc@global@numsep{#4}%
 %    \end{macrocode}
 %
 % Next check for optional input and set the options accordingly. Unknown
@@ -980,7 +1028,7 @@
 % scope.
 % Seems not to work well with the scope...
 %    \begin{macrocode}
-% \tikznocset{#1}%
+% \tikznocset{#2}%
 % \edef\tikznoc@scopeCommands{\XKV@rm}%
 % \tikzset{tikznocScopeCommand/.style={\XKV@rm}}%
 %    \end{macrocode}
@@ -998,13 +1046,13 @@
 %
 % Enclose the noc in its own scope.
 %    \begin{macrocode}
-\begin{scope}[#1]%[{tikznocScopeCommand}]%[\tikznoc@scopeCommands]
+\begin{scope}[#2]%[{tikznocScopeCommand}]%[\tikznoc@scopeCommands]
 %    \end{macrocode}
 %
 % Start two TeX loops going from 0 to numRows-1 / numCols-1.
 %    \begin{macrocode}
-\whiledo{\the\tikznocNumberOfRows < #2}{%
-  \whiledo{\the\tikznocNumberOfColumns < #4}{%
+\whiledo{\the\tikznocNumberOfRows < #3}{%
+  \whiledo{\the\tikznocNumberOfColumns < #5}{%
 %    \end{macrocode}
 %
 % Increase the router number.
@@ -1015,8 +1063,8 @@
 % Draw the routers if boolean is true.
 %    \begin{macrocode}
       \iftikznoc@ctrl@router
-        \draw (\the\tikznocNumberOfColumns,-\the\tikznocNumberOfRows) %
-        rectangle ++( 0.5, 0.5);%
+        \draw (\tikznoc@colSep*\the\tikznocNumberOfColumns,-\tikznoc@rowSep*\the\tikznocNumberOfRows) %
+        rectangle ++( \tikznoc@width, \tikznoc@height);%
       \fi
 %    \end{macrocode}
 %
@@ -1034,30 +1082,34 @@
 % Additionally, the coordinates useP are defined and overwritten in each iteration.
 % However, use these coordinates to draw locally only at the current router.
 %    \begin{macrocode}
-      \path (\the\tikznocNumberOfColumns,-\the\tikznocNumberOfRows) %
-      ++( 0.25, 0.25) coordinate[alias=useC]
+      \path (%
+        +\tikznoc@colSep*\the\tikznocNumberOfColumns,%
+        -\tikznoc@rowSep*\the\tikznocNumberOfRows) %
+        ++( \tikznoc@halfWidth, \tikznoc@halfHeight) coordinate[alias=useC]
         (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns c);%
-      \path (\the\tikznocNumberOfColumns,-\the\tikznocNumberOfRows) %
+      \path (%
+        +\tikznoc@colSep*\the\tikznocNumberOfColumns,%
+        -\tikznoc@rowSep*\the\tikznocNumberOfRows) %
                         coordinate[alias=useSW] (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns sw)%
-        ++( 0.25,    0)
+        ++( \tikznoc@halfWidth, 0)
           coordinate[alias=useS]
           (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns s)%
-        ++( 0.25,    0)
+        ++( \tikznoc@halfWidth, 0)
           coordinate[alias=useSE]
           (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns se)%
-        ++( 0   , 0.25)
+        ++( 0                 , \tikznoc@halfHeight)
           coordinate[alias=useE]
           (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns e)%
-        ++( 0   , 0.25)
+        ++( 0                 , \tikznoc@halfHeight)
           coordinate[alias=useNE]
           (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns ne)%
-        ++(-0.25,    0)
+        ++(-\tikznoc@halfWidth, 0)
           coordinate[alias=useN]
           (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns n)%
-        ++(-0.25,    0)
+        ++(-\tikznoc@halfWidth, 0)
           coordinate[alias=useNW]
           (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns nw)%
-        ++( 0   ,-0.25)
+        ++( 0                 ,-\tikznoc@halfHeight)
           coordinate[alias=useW]
           (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns w)%
       ;%
