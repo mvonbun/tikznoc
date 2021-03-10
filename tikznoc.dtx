@@ -1,20 +1,20 @@
 % \iffalse meta-comment
-% 
+%
 % Copyright (C) 2014 by Michael Vonbun <m.vonbun@gmail.com>
 % ---------------------------------------------------------
-% 
+%
 % This file may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either version 1.2
 % of this license or (at your option) any later version.
 % The latest version of this license is in:
-% 
+%
 %    http://www.latex-project.org/lppl.txt
-% 
-% and version 1.2 or later is part of all distributions of LaTeX 
+%
+% and version 1.2 or later is part of all distributions of LaTeX
 % version 1999/12/01 or later.
-% 
+%
 % \fi
-% 
+%
 % \iffalse
 %<*driver>
 \ProvidesFile{tikznoc.dtx}
@@ -24,7 +24,7 @@
 %<*package>
     [2014/08/01 v1.0 draw 2d mesh nocs using tikz]
 %</package>
-% 
+%
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{xkvview}
@@ -40,9 +40,9 @@
 \end{document}
 %</driver>
 % \fi
-% 
-% \CheckSum{846}
-% 
+%
+% \CheckSum{849}
+%
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -58,8 +58,8 @@
 %   Right bracket \]     Circumflex    \^     Underscore    \_
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
-% 
-% 
+%
+%
 % \changes{v1.0}{2014/08/01}{Initial version}
 % \changes{v1.1}{2017/02/03}{Extend documentation}
 % \changes{v1.2}{2019/03/18}{Add macro to connect routers by routes}
@@ -69,9 +69,11 @@
 % \changes{v1.5}{2019/06/17}{Add star version to tikznocRoute to connect tiles}
 % \changes{v1.6}{2019/06/17}{Add options to control the node number text}
 % \changes{v1.7}{2019/07/15}{Add option to have edge numbers}
-% 
+% \changes{v1.8}{2021/03/10}{Add options to scale the routers in size and to
+% adjust their distance}
+%
 % \GetFileInfo{tikznoc.dtx}
-% 
+%
 % \DoNotIndex{%
 % \def,\edef,\relax,
 % \newcommand,
@@ -85,57 +87,57 @@
 % \csname,\endcsname,
 % \draw,\path,\RequirePackage,\PackageWarning,\ProcessOptions
 % }
-% 
-% 
+%
+%
 % \title{The \textsf{tikznoc} package\thanks{This document
 %   corresponds to \textsf{tikznoc}~\fileversion, dated \filedate.}}
 % \author{Michael Vonbun \\ \texttt{m.vonbun@gmail.com}}
-% 
+%
 % \maketitle
-% 
+%
 % \section{Introduction}%
-% 
+%
 % This package uses TikZ to typeset 2D-mesh NoCs in an easy and intuitive way.
 % \setkeys[tikznoc]{route}{style, source offset, sink offset}%
 % \makeatletter
 % \tikznoc@route@sinkoffset
 % \makeatother
-% 
+%
 % \section{Macros Provided}%
 % \subsection{Main Macros}%
 % \DescribeMacro{\tikznoc}
 % |\tikznoc|\oarg{tikzKey=Val}\marg{$m$}\marg{$n$}\\
 % Draw an $m$-by-$n$ 2D-mesh, where $m$ and $n$ are the number of rows
 % and columns of the 2D-mesh NoC.
-% 
+%
 % \noindent
 % \DescribeMacro{\tikznoclink}
 % |\tikznoclink|\marg{$rc$}\marg{port}\\
 % joins the router with index $rc$ with a neighbor using port
 % \{N,E,S,W\}.
-% 
+%
 % \noindent
 % \DescribeMacro{\tikznoctile}
 % |\tikznoctile|\oarg{tile style}\marg{router index}\\
 % Macro to draw a tile at a router.
-% 
+%
 % \noindent
 % \DescribeMacro{\tikznoctikznocembed}
 % |\tikznocembed|\oarg{}\marg{$r$}\marg{$c$}\\
 % Surround a NoC with partly links to indicate it is part of a bigger
 % NoC.
-% 
+%
 % \noindent
 % \DescribeMacro{\tikznocColorRouters}
 % |\tikznocColorRouters|\oarg{seperator}\marg{router indices, separated}\marg{color}\\
 % Router coloring macro. The default seperator is |<,>|.
-% 
+%
 % \noindent
 % \DescribeMacro{\drawateveryrouter}
 % |\drawateveryrouter|\marg{COMMANDS}\\
 % Use \emph{before} drawing the mesh to put something at every router.
 % Inside the COMMANDS part, local coordinates can (and should) be used.
-% 
+%
 % \noindent
 % \DescribeMacro{\drawatrouter}
 % |\drawatrouter|\marg{$rc$}\marg{COMMANDS}\\
@@ -162,19 +164,19 @@
 % the star options controls drawing of the arrow tips. Default (no star) is to
 % add the arrow tip only for the last route segment, one star adds arrow tips to
 % every route segment (hop), two stars add no tips at all.
-% 
+%
 % \noindent
 % \DescribeMacro{\tikznocprintid}
 % |\tikznocprintid|\oarg{}\marg{router index}\\
 % Print router id.
-% 
-% 
+%
+%
 % \subsection{Auxiliary Macros}%
 % \DescribeMacro{\tikznocsplitid}
 % |\tikznocsplitid|\marg{router index}\marg{row index macro name}\marg{column index macro name}\\
 % Split the router id into row and column indices and store them in two
 % new macros.
-% 
+%
 % \noindent
 % \DescribeMacro{\tikznocidtonum}
 % |\tikznocidtonum|\oarg{offset}\marg{router index}\marg{number macro name}\\
@@ -187,22 +189,22 @@
 % macro name}\\
 % Macro to convert the decimal number of a router to its index
 % ($n_{row}n_{col}$) and store it a new macro.
-% 
-% 
+%
+%
 % \section{Installation}%
-% 
+%
 % Install this package like any other \LaTeX~package.\\
-% 
+%
 % \noindent
 % The end of this file contains the installation file (.ins) code in case
 % the provided ins-file got lost.\\
-% 
+%
 % \noindent
 % For style creation run |latex tikznoc.ins|.
 % For doc/manual creation run |latex tikznoc.dtx| afterwards.
-% 
+%
 % \section{Dependencies}%
-% 
+%
 % As of \textsf{tikznoc}~\fileversion~this package depends on
 % \begin{itemize}
 %    \item \textsf{tikz}
@@ -211,15 +213,15 @@
 %    \item \textsf{xstring}
 %    \item \textsf{xparse}
 % \end{itemize}
-% 
+%
 % \section{Usage}%
-% 
-% % To use the macros described below, 
+%
+% % To use the macros described below,
 % put |\usepackage{tikznoc}| in your document preamble
 % (after you made sure that |tikznoc.sty| can be found by your \LaTeX ~distribution).
-% 
+%
 % \subsection{Package Options}%
-% 
+%
 % \begin{tabular}{ll}%
 %   Option & Description \\\hline
 %       showid & Puts an ID in the middle of every router \\
@@ -230,9 +232,9 @@
 %       tightEdges & Uses tight edge style \\
 %       looseEdges & Uses loose edge style \\\hline
 % \end{tabular}%
-% 
+%
 % \subsection{Style Options}%
-% 
+%
 % The keys are pretty self-explaining. They pretty much correspond to the package options.
 % \DescribeMacro{\tikznocset}
 % |\tikznocset|\marg{Key=Value}\\
@@ -247,11 +249,11 @@
 % textlf}) are supported as keys (not commands!).  So, to get tiny bold numbers,
 % use:\\
 % |\tikznocset{numberSize=tiny,numberFont=textbf}|.
-% 
-% 
+%
+%
 % \clearpage
 % \section{Package Usage Example Gallery}%
-% 
+%
 % \noindent
 % \DescribeMacro{\tikznoc}\noindent
 % \begin{minipage}[t]{0.3\textwidth}%
@@ -267,8 +269,8 @@
 % |  \tikznoc{3}{3}| \\
 % |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
-% 
+%
+%
 % \noindent
 % \DescribeMacro{\tikznoc}
 % \DescribeMacro{\tikznocColorRouters}
@@ -289,8 +291,8 @@
 %   |  \tikznocColorRouters{01,11}{lime}| \\
 % |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
-% 
+%
+%
 % \noindent
 % \DescribeMacro{\tikznoc}
 % \DescribeMacro{\tikznocRoute}
@@ -319,7 +321,7 @@
 % \end{minipage}\\[2ex]
 % \noindent
 %
-% 
+%
 % \noindent
 % \DescribeMacro{\tikznoc}
 % \DescribeMacro{\tikznocPath}
@@ -342,8 +344,8 @@
 %   |\tikznocPath**[teal]{00,01,11,12}| \\
 % |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
-% 
+%
+%
 % \noindent
 % \DescribeMacro{\tikznoc}
 % \DescribeMacro{\tikznocset}
@@ -359,9 +361,9 @@
 % |\begin{tikzpicture}[thick]%| \\
 % |  \tikznocset{tile}| \\
 % |  \tikznoc{3}{3}| \\
-% |\end{tikzpicture}| 
+% |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
+%
 %
 % \noindent
 % \DescribeMacro{\tikznoc}
@@ -383,10 +385,10 @@
 % |  \tikznoc{3}{3}| \\
 % |  \tikznocRoute[xy][teal]{00}*[below left]{11}| \\
 % |  \tikznocRoute[xy][lime]{20}*{22}*| \\
-% |\end{tikzpicture}| 
+% |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
-% 
+%
+%
 % \noindent
 % \DescribeMacro{\tikznoc}
 % \DescribeMacro{\tikznoctile}
@@ -407,8 +409,8 @@
 %   |  \tikznoctile[fill=lime]{11}| \\
 % |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
-% 
+%
+%
 % \noindent
 % \DescribeMacro{\tikznoc}
 % \DescribeMacro{\tikznocembed}
@@ -427,7 +429,7 @@
 %   |  \tikznocembed{3}{3}| \\
 % |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
+%
 %
 % \noindent
 % \DescribeMacro{\tikznoc}
@@ -448,7 +450,7 @@
 % |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
 %
-% 
+%
 % \noindent
 % \DescribeMacro{\tikznoc}
 % \DescribeMacro{\drawateveryrouter}
@@ -469,9 +471,9 @@
 % |\end{tikzpicture}|
 % \end{minipage}\\
 % This macro is aware of the scaling options of |\tikznoc|.\\[2ex]
-% 
-% 
-% 
+%
+%
+%
 % \noindent
 % \DescribeMacro{\tikznoc}
 % \DescribeMacro{\drawatrouter}
@@ -492,8 +494,8 @@
 % |\end{tikzpicture}|
 % \end{minipage}\\
 % This macro is aware of the scaling options of |\tikznoc|.\\[2ex]
-% 
-% 
+%
+%
 % \noindent
 % \DescribeMacro{\tikznoc}
 % \DescribeMacro{\tikznocset}
@@ -517,13 +519,13 @@
 % |  \tikznoclink{11}{W}| \\
 % |\end{tikzpicture}|
 % \end{minipage}
-% 
-% 
-% 
+%
+%
+%
 % \clearpage
-% 
+%
 % \section{Macro Usage Details}
-% \subsection{Details on the router} 
+% \subsection{Details on the router}
 % \paragraph{Router Dimensions}
 % The spacing of the routers is 1 TikZ-Unit (1 cm), if no scaling is used:
 % \begin{center}%
@@ -533,7 +535,7 @@
 %   \draw[<->] (-0.25,0) -- node[left] {1 cm} ++(0,1);
 % \end{tikzpicture}
 % \end{center}
-% 
+%
 % \paragraph{Router IDs / Indices}
 % Every router gets an id of the form $n_rn_c$, i.e. RowColumn, starting from
 % the top-left corner at index $00$ to the bottom-right corner with index
@@ -542,10 +544,10 @@
 % \begin{tikzpicture}[thick]%
 %   \tikznoc{2}{3}
 %   \path (r00c) node {00} (r12c) node {12};
-% \end{tikzpicture}  
+% \end{tikzpicture}
 % \end{center}
-% 
-% 
+%
+%
 % \paragraph{Router Named Coordinates} Based on the router index, every router
 % defines some global and local coordinates.
 % \begin{center}%
@@ -557,11 +559,11 @@
 % The global ones are |rRowCol{c,n,e,s,w,ne,nw,se,sw}|, that is, the letter |r|,
 % followed by the router index (RowColumn) and the port identifier in lowercase
 % letters.
-% 
+%
 % The local ones are |use{C,N,E,S,W,NE,NW,SE,SE}|, that is, the keyword |use|,
 % followed by the port identifier in uppercase letters.  These local coordinates
 % are useful only within the |\drawatXrouter| command definition (see below).
-% 
+%
 %
 % \clearpage
 % \subsection{The Interface}
@@ -570,12 +572,12 @@
 % is the main option / interface macro.
 % The list of keys is
 % \xkvview{family=ctrl}
-% 
-% 
+%
+%
 % The keys are pretty self-explaining. They pretty much correspond to the
 % package options.  The result of each option is typeset here (same order as
 % table).\\[2ex]
-% 
+%
 % \begin{minipage}{.3\linewidth}
 %   \begin{tikzpicture}[thick]%
 %     \tikznocset{router=false}
@@ -588,7 +590,7 @@
 %   |  \tikznoc{2}{2}| \\
 %   |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
+%
 % \begin{minipage}{.3\linewidth}
 % \begin{tikzpicture}[thick]%
 %   \tikznocset{showid}
@@ -601,7 +603,7 @@
 % |  \tikznoc{2}{3}| \\
 % |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
+%
 % \begin{minipage}{.3\linewidth}
 % \begin{tikzpicture}[thick]%
 %   \tikznocset{shownumber}
@@ -612,9 +614,9 @@
 % |\begin{tikzpicture}[thick]%| \\
 % |  \tikznocset{shownumber}| \\
 % |  \tikznoc{2}{3}| \\
-% |\end{tikzpicture}| 
+% |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
+%
 % \begin{minipage}{.3\linewidth}
 % \begin{tikzpicture}[thick]%
 %   \tikznocset{portnames}
@@ -625,7 +627,7 @@
 % |\begin{tikzpicture}[thick]%| \\
 % |  \tikznocset{portnames}| \\
 % |  \tikznoc{1}{1}| \\
-% |\end{tikzpicture}| 
+% |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
 %
 % \begin{minipage}{.3\linewidth}
@@ -640,7 +642,7 @@
 %   |\tikznoc{2}{3}| \\
 % |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
+%
 % \begin{minipage}{.3\linewidth}
 % \begin{tikzpicture}[thick]%
 %   \tikznocset{doubleEdges}
@@ -651,9 +653,9 @@
 % |\begin{tikzpicture}[thick]%| \\
 % |  \tikznocset{doubleEdges}| \\
 % |  \tikznoc{2}{3}| \\
-% |\end{tikzpicture}| 
+% |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
+%
 % \begin{minipage}{.3\linewidth}
 % \begin{tikzpicture}[thick]%
 %   \tikznocset{tile}
@@ -664,9 +666,9 @@
 % |\begin{tikzpicture}[thick]%| \\
 % |  \tikznocset{tile}| \\
 % |  \tikznoc{2}{3}| \\
-% |\end{tikzpicture}| 
+% |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
+%
 % \begin{minipage}{.3\linewidth}
 % \begin{tikzpicture}[thick]%
 %   \tikznocset{tile,connectTile=false}
@@ -677,9 +679,9 @@
 % |\begin{tikzpicture}[thick]%| \\
 % |  \tikznocset{tile,connectTile=false}| \\
 % |  \tikznoc{2}{3}| \\
-% |\end{tikzpicture}| 
+% |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
+%
 % \begin{minipage}{.3\linewidth}
 % \begin{tikzpicture}[thick]%
 %   \tikznocset{edgeStyle=loose}
@@ -690,13 +692,13 @@
 % |\begin{tikzpicture}[thick]%| \\
 % |  \tikznocset{edgeStyle=loose}| \\
 % |  \tikznoc{2}{3}| \\
-% |\end{tikzpicture}| 
+% |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
+%
 % The |numRow| and |numCol| keys are used internally only.
-% 
-% 
-% \paragraph{A note on edges} 
+%
+%
+% \paragraph{A note on edges}
 % There are 4 possible edge styles, combining 2 edge properties: |doubleEdges|
 % and |loose|/|tight|-style.  Those four combinations are showd here.\\[2ex]
 % \noindent
@@ -724,14 +726,14 @@
 %   |  \tikznoc[scale=1.5,xshift=2cm,yshift=-2cm]{2}{2}| \\
 % |\end{tikzpicture}|
 % \end{minipage}\\[2ex]
-% 
+%
 % \clearpage
-% 
+%
 % \subsection{The tikznoc Macro}
 % The optional argument takes a KeyValue list and passes these to the underlying
 % TikZ layer.  Thus, only TikZ keys should be used.  Using this mechanism allows
 % for easy customization:
-% 
+%
 % \begin{minipage}[t]{0.45\textwidth}%
 % Example: \\
 % \begin{tikzpicture}[thick]%
@@ -747,12 +749,12 @@
 % |  \tikznoc[scale=2,xshift=1cm,yshift=-0.5cm]{2}{2}| \\
 % |\end{tikzpicture}|
 % \end{minipage}
-% 
-% 
+%
+%
 % \subsection{The drawatrouter Macros}
 % \DescribeMacro{\drawateveryrouter} |\drawateveryrouter|\marg{COMMANDS} Allows
 % to draw something at every router. Used before the main |\tikznoc| macro.
-% 
+%
 % \DescribeMacro{\drawatrouter} |\drawatrouter|\marg{$n_rn_c$}\marg{COMMANDS}
 % Allows to draw in a router. Used after the main |\tikznoc| macro.\\
 %
@@ -775,21 +777,21 @@
 % \end{scope}
 % \end{tikzpicture}
 % \end{center}
-% 
-% 
+%
+%
 % \subsection{The Tiles}
 % Tiles are either set globally using the |\tikznocset{tile=true}| option, or
 % using the macro |\tikznoctile{router-id}|.
-% 
+%
 % Tiles use the TikZ-style |tile|, feel free to change / append to this style.
 % By default, the |tile| style is defined as:\\
 % |\tikzset{tile/.style={draw,circle,minimum size=0.5cm},router/.style={}}|
-% 
+%
 % \clearpage
 % \subsection{Connect Routers via Routes}
 % The routes have their own key-val system.
 % \xkvview{family=route}
-% 
+%
 % \noindent
 % \DescribeMacro{\tikznocRoute}
 % |\tikznocRoute|\oarg{key-val}\marg{src-id}\marg{sink-id}\\
@@ -797,8 +799,8 @@
 % coordinates of start and end of the route.  The reference point of an alias is
 % the center of the router.  The list of known alias is \\
 % |none, above, below, left, right, above left, above right, below left, below right|.
-% 
-% 
+%
+%
 % \paragraph{Controlling the Offset Amount} To control the size of the offset of
 % the alias / anchors you can use
 % \begin{itemize}
@@ -808,17 +810,17 @@
 %   \item |xsrcoffset=dim|, |ysrcoffset=dim|, |xsinkoffset=dim|, and
 %     |ysinkoffset=dim| to set all offsets individually.
 % \end{itemize}
-% 
+%
 % \paragraph{Controlling the Route Taken} The routes themselves are set using
 % the |style| key.  Known routes are |xy, yx, direct|.
-% 
+%
 % \clearpage
-% 
-% 
+%
+%
 % \StopEventually{}
-% 
+%
 % \section{Implementation}%
-% 
+%
 % \subsection{Load Dependencies}%
 %    \begin{macrocode}
 \RequirePackage{tikz}%
@@ -827,9 +829,9 @@
 \RequirePackage{xstring}%
 \RequirePackage{xparse}%
 %    \end{macrocode}
-% 
+%
 % \subsection{Key-Val Interface}%
-% 
+%
 % Boolean conditionals that control what basic entities are shown.\\
 % |showid| puts the router id in the middle of the router.\\
 % |portnames| labels the ports of each router, that is the coordinates
@@ -844,14 +846,14 @@
 \define@boolkeys[tikznoc]{ctrl}{link,doubleEdges,enumEdges}[true]%
 \define@boolkeys[tikznoc]{ctrl}{tile,connectTile}[true]%
 %    \end{macrocode}
-% 
+%
 % Double edge style keyval macro. Two options, tight and loose.
 % Define the choicekey.
 %    \begin{macrocode}
 \define@choicekey*[tikznoc]{ctrl}{edgeStyle}[\val\nr]{loose,tight}[tight]{%
 %    \end{macrocode}
-% 
-% If tight option is provided, the link macro should use the node coordinate node.center, 
+%
+% If tight option is provided, the link macro should use the node coordinate node.center,
 % otherwise the node coordinate itself is used.
 %    \begin{macrocode}
   \ifcase\nr\relax
@@ -861,47 +863,56 @@
   \fi
 }%
 %    \end{macrocode}
-% 
+%
 % Global number of rows and number of column macros.
 %    \begin{macrocode}
 \define@cmdkeys[tikznoc]{ctrl}{numRow,numCol}%
 %    \end{macrocode}
-% 
+%
 % Global router number seperator.
 %    \begin{macrocode}
 \define@cmdkeys[tikznoc]{ctrl}{numSep}%
 \setkeys[tikznoc]{ctrl}{numSep={}}%
 %    \end{macrocode}
-% 
-% 
+%
+%
 % Assign default here, thus the link macro does not use an undefined macro.
 %    \begin{macrocode}
 \setkeys[tikznoc]{ctrl}{edgeStyle=tight}%
 %    \end{macrocode}
-% 
-% 
+%
+%
+% Add options for scaling the router distance.
+% First are scaling factors for the rows and columns. Also set their defaults.
+%    \begin{macrocode}
+\define@cmdkey[tikznoc]{ctrl}{rowSepScale}[1]{}%
+\define@cmdkey[tikznoc]{ctrl}{colSepScale}[1]{}%
+\setkeys[tikznoc]{ctrl}{rowSepScale,colSepScale}%
+%    \end{macrocode}
+%
+%
 % Define TikZ styles used here.
 %    \begin{macrocode}
 \tikzset{tile/.style={draw,circle,minimum size=0.5cm},router/.style={}}%
 %    \end{macrocode}
-% 
-% 
+%
+%
 % Set defaults here, i.e. only set drawing of routers and links to be <true> by default
 % (conditionals are always intialized <false>)
 %    \begin{macrocode}
 \setkeys[tikznoc]{ctrl}{router,link,connectTile,enumEdges=false}%
 %    \end{macrocode}
-% 
+%
 % Provide basic interface macro.
 % \begin{macro}{\tikznocset}
 %    \begin{macrocode}
 \newcommand{\tikznocset}[2][]{\setkeys*[tikznoc]{ctrl}{#2}}%
 %    \end{macrocode}
 % \end{macro}
-% 
-% 
+%
+%
 % \subsection{Package Options}%
-% 
+%
 % Add a package option for every Boolean conditional to switch default behavior.
 %    \begin{macrocode}
 \DeclareOption{showid}{\setkeys[tikznoc]{ctrl}{showid=true}}%
@@ -917,44 +928,44 @@
 \DeclareOption{disconnectTiles}{\setkeys[tikznoc]{ctrl}{connectTile=false}}%
 \ProcessOptions\relax
 %    \end{macrocode}
-% 
-% 
+%
+%
 % \subsection{Auxiliary Commands, Counters, and Stuff}%
-% 
+%
 % Define row and column counters for main macro and initialize them to 0.
 %    \begin{macrocode}
 \newcount\tikznocNumberOfRows\tikznocNumberOfRows=0%
 \newcount\tikznocNumberOfColumns\tikznocNumberOfColumns=0%
 %    \end{macrocode}
-% 
+%
 % Define index counters for link macro.
 %    \begin{macrocode}
 \newcount\tikznoclinkToRowIndex%
 \newcount\tikznoclinkToColumnIndex%
 %    \end{macrocode}
-% 
+%
 % Define linear index counters for routers, links, and edge macro.
 %    \begin{macrocode}
 \newcount\tikznocRouterNumber\tikznocRouterNumber=0%
 \newcount\tikznocLinkNumber\tikznocLinkNumber=0%
 \newcount\tikznocEdgeNumber\tikznocEdgeNumber=0%
 %    \end{macrocode}
-% 
+%
 % Internal interface macro for easy access to all routers.
 %    \begin{macrocode}
 \def\tikznoc@draw@at@every@router{}%
 %    \end{macrocode}
-% 
-% 
+%
+%
 % \subsection{Main NoC-Draw Macros}%
-% 
+%
 % Main noc generation command.\\
 % Syntax: |\tikznoc|\oarg{tikzKey=Val}\marg{r}\marg{c}
 % \begin{macro}{\tikznoc}
 %    \begin{macrocode}
 \DeclareDocumentCommand{\tikznoc}{ O{} m O{\cmdtikznoc@ctrl@numSep} m }{%
 %    \end{macrocode}
-% 
+%
 % Check if both arguments are numbers and greater than 0,
 % 0 rows or columns are nonsense. If so, first store their values.
 %    \begin{macrocode}
@@ -963,7 +974,7 @@
 \def\tikznoc@global@numcol{#4}%
 \def\tikznoc@global@numsep{#3}%
 %    \end{macrocode}
-% 
+%
 % Next check for optional input and set the options accordingly. Unknown
 % keys are stored in |\XKV@rm| and are passed as argument to the network
 % scope.
@@ -973,7 +984,7 @@
 % \edef\tikznoc@scopeCommands{\XKV@rm}%
 % \tikzset{tikznocScopeCommand/.style={\XKV@rm}}%
 %    \end{macrocode}
-% 
+%
 % Reset the router counters for row, column, and number. Optionally, also reset
 % the edge number counter.
 %    \begin{macrocode}
@@ -984,23 +995,23 @@
   \tikznocEdgeNumber=0%
 \fi
 %    \end{macrocode}
-% 
+%
 % Enclose the noc in its own scope.
 %    \begin{macrocode}
 \begin{scope}[#1]%[{tikznocScopeCommand}]%[\tikznoc@scopeCommands]
 %    \end{macrocode}
-% 
+%
 % Start two TeX loops going from 0 to numRows-1 / numCols-1.
 %    \begin{macrocode}
 \whiledo{\the\tikznocNumberOfRows < #2}{%
   \whiledo{\the\tikznocNumberOfColumns < #4}{%
 %    \end{macrocode}
-% 
+%
 % Increase the router number.
 %    \begin{macrocode}
      \advance\tikznocRouterNumber by 1
 %    \end{macrocode}
-% 
+%
 % Draw the routers if boolean is true.
 %    \begin{macrocode}
       \iftikznoc@ctrl@router
@@ -1008,10 +1019,10 @@
         rectangle ++( 0.5, 0.5);%
       \fi
 %    \end{macrocode}
-% 
-% Setup the global router coordinates, 
+%
+% Setup the global router coordinates,
 % they are rRCP, with R: row index, C: column index, P: port, which can be
-% c (center), 
+% c (center),
 % sw (south-west or bottom-left corner)
 % s (south or bottom)
 % sw (south-east or bottom-right corner)
@@ -1024,33 +1035,48 @@
 % However, use these coordinates to draw locally only at the current router.
 %    \begin{macrocode}
       \path (\the\tikznocNumberOfColumns,-\the\tikznocNumberOfRows) %
-        ++( 0.25, 0.25) coordinate[alias=useC]  (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns c);%
+      ++( 0.25, 0.25) coordinate[alias=useC]
+        (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns c);%
       \path (\the\tikznocNumberOfColumns,-\the\tikznocNumberOfRows) %
                         coordinate[alias=useSW] (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns sw)%
-        ++( 0.25,    0) coordinate[alias=useS]  (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns s)%
-        ++( 0.25,    0) coordinate[alias=useSE] (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns se)%
-        ++( 0   , 0.25) coordinate[alias=useE]  (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns e)%
-        ++( 0   , 0.25) coordinate[alias=useNE] (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns ne)%
-        ++(-0.25,    0) coordinate[alias=useN]  (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns n)%
-        ++(-0.25,    0) coordinate[alias=useNW] (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns nw)%
-        ++( 0   ,-0.25) coordinate[alias=useW]  (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns w)%
+        ++( 0.25,    0)
+          coordinate[alias=useS]
+          (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns s)%
+        ++( 0.25,    0)
+          coordinate[alias=useSE]
+          (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns se)%
+        ++( 0   , 0.25)
+          coordinate[alias=useE]
+          (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns e)%
+        ++( 0   , 0.25)
+          coordinate[alias=useNE]
+          (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns ne)%
+        ++(-0.25,    0)
+          coordinate[alias=useN]
+          (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns n)%
+        ++(-0.25,    0)
+          coordinate[alias=useNW]
+          (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns nw)%
+        ++( 0   ,-0.25)
+          coordinate[alias=useW]
+          (r\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns w)%
       ;%
 %    \end{macrocode}
-% 
+%
 % The external |draw-at-every| command is put in here.
 %    \begin{macrocode}
       \tikznoc@draw@at@every@router
 %    \end{macrocode}
-% 
+%
 % Print router ids at the center if boolean is true.
 %    \begin{macrocode}
   \tikznocprintid{\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns}%
 %    \end{macrocode}
-% 
+%
 % Print port names if boolean is true. % FIXME: put in own macro
 %    \begin{macrocode}
 \iftikznoc@ctrl@portnames
-  \path 
+  \path
     (useC)  node              {C}%
     (useSW) node[below left]  {SW}%
     (useS)  node[below]       {S}%
@@ -1063,11 +1089,11 @@
   ;
 \fi
 %    \end{macrocode}
-% 
-% 
+%
+%
 % Draw the links. In the 2D-mesh the edge routers do not have all 4
 % connections.
-% Join the rows, from a row below to a row above (north orientation); 
+% Join the rows, from a row below to a row above (north orientation);
 % start with row with index 1 to omit putting edges to the bottom-row of the network.
 % Join the columns, same as before, this time we join to the left (west orientation).
 %    \begin{macrocode}
@@ -1080,16 +1106,16 @@
          \fi
       \fi
 %    \end{macrocode}
-% 
-% 
+%
+%
 % Draw the tiles.
 %    \begin{macrocode}
 \iftikznoc@ctrl@tile
   \tikznoctile{\the\tikznocNumberOfRows\tikznoc@global@numsep\the\tikznocNumberOfColumns}%
 \fi
 %    \end{macrocode}
-% 
-%  
+%
+%
 % Close the loops by advancing the internal counters.
 %    \begin{macrocode}
   \advance\tikznocNumberOfColumns by 1
@@ -1098,45 +1124,45 @@
 \tikznocNumberOfColumns=0
 }%
 %    \end{macrocode}
-% 
-% 
+%
+%
 % End the tikz scope and the initial "`IF"' that checks for valid input.
 %    \begin{macrocode}
 \end{scope}
 }%
 %    \end{macrocode}
-% 
+%
 % Reset the external interface function and terminate the macro.
 %    \begin{macrocode}
 \def\tikznoc@draw@at@every@router{}%
 }%
 %    \end{macrocode}
 % \end{macro}
-% 
-% 
-% 
+%
+%
+%
 % \section{Auxiliary Macros}
 % Define some auxiliary macros here.
-% 
-% 
+%
+%
 % Macro to draw the links.\\
 % Syntax: |\tikznoclink|\oarg{router index}\oarg{port to use}
 % \begin{macro}{\tikznoclink}
 %    \begin{macrocode}
-\newcommand{\tikznoclink}[3][]{% 
+\newcommand{\tikznoclink}[3][]{%
 %    \end{macrocode}
-% 
+%
 % 'Parse' input by breaking the indices in two parts.
 %    \begin{macrocode}
 \tikznocsplitid{#2}{tikznoclinkFromRowIndex}{tikznoclinkFromColumnIndex}%
 %    \end{macrocode}
-% 
+%
 % Copy the splitted parts also to the <TO> counters.
 %    \begin{macrocode}
 \tikznoclinkToRowIndex=\tikznoclinkFromRowIndex
 \tikznoclinkToColumnIndex=\tikznoclinkFromColumnIndex
 %    \end{macrocode}
-% 
+%
 % Conditionally set the to coordinates and the outgoing port.
 % The 'Offset' variables are for the 'doubleEdges' option.
 %    \begin{macrocode}
@@ -1177,12 +1203,12 @@
   \def\tikznocEdgeLabelOffsetY{0.75}%
 }{}%
 %    \end{macrocode}
-% 
+%
 % Draw the edges.
 % Double directed edge.
 %    \begin{macrocode}
 \iftikznoc@ctrl@doubleEdges
-  \path 
+  \path
     (r\tikznoclinkFromRowIndex\tikznoclinkFromColumnIndex\tikznoclinkFromPort) node[\tikznoclinkOffsetTop] (ft) {}%
     (r\tikznoclinkFromRowIndex\tikznoclinkFromColumnIndex\tikznoclinkFromPort) node[\tikznoclinkOffsetBot] (fb) {}%
     (r\the\tikznoclinkToRowIndex\the\tikznoclinkToColumnIndex\tikznoclinkToPort) node[\tikznoclinkOffsetTop] (tt) {}%
@@ -1203,7 +1229,7 @@
   \fi
 \else
 %    \end{macrocode}
-% 
+%
 % Undirected edge.
 %    \begin{macrocode}
   \path (r\tikznoclinkFromRowIndex\tikznoclinkFromColumnIndex\tikznoclinkFromPort) node (from) {}%
@@ -1220,8 +1246,8 @@
 }
 %    \end{macrocode}
 % \end{macro}
-% 
-% 
+%
+%
 % Macro to split the router id into row and column indices.\\
 % Syntax: |\tikznocsplitid|\marg{router index}\marg{row index
 % macro name}\marg{column index macro name}
@@ -1258,8 +1284,8 @@
 }%
 %    \end{macrocode}
 % \end{macro}
-% 
-% 
+%
+%
 % Macro to convert router index ($n_{row}n_{col}$) to decimal number.\\
 % Syntax: |\tikznocidtonum|\oarg{offset}\marg{router index}\marg{number macro name}
 % \begin{macro}{\tikznocidtonum}
@@ -1268,7 +1294,7 @@
 \define@key[tikznoc]{ctrl}{numbersStartAt}[0]{\tikznoc@numbers@start@value=#1}%
 \newcommand{\tikznocidtonum}[3][0]{%
 %    \end{macrocode}
-% Split the router id into row and column indices. 
+% Split the router id into row and column indices.
 %    \begin{macrocode}
 \tikznocsplitid{#2}{tikznoc@idtonum@row}{tikznoc@idtonum@col}%
 %    \end{macrocode}
@@ -1287,7 +1313,7 @@
 }%
 %    \end{macrocode}
 % \end{macro}
-% 
+%
 % Macro to convert the decimal number of a router to its index ($n_{row}n_{col}$).\\
 % Syntax: |\tikznocnumtoid|\oarg{first index offset}\marg{router number}\marg{router index
 % macro name}
@@ -1337,8 +1363,8 @@
 }%
 %    \end{macrocode}
 % \end{macro}
-% 
-% 
+%
+%
 % ID printing.\\
 % Syntax: |\tikznocprintid|\oarg{}\marg{router index}
 % \begin{macro}{\tikznocprintid}
@@ -1423,23 +1449,23 @@
 }%
 %    \end{macrocode}
 % \end{macro}
-% 
-% 
-% 
+%
+%
+%
 % Router coloring macro.\\
 % Syntax: |\tikznocColorRouters|\oarg{seperator}\marg{router indices separated by comma}\marg{color}
 % \begin{macro}{\tikznocColorRouters}
 %    \begin{macrocode}
-\newcommand{\tikznocColorRouters}[3][,]{% 
+\newcommand{\tikznocColorRouters}[3][,]{%
 %    \end{macrocode}
-% 
+%
 % 'Parse' input.
 % Loop through second argument as long as it is not empty:
 %    \begin{macrocode}
 \def\tikznoc@split@behind{#2}%
 \whiledo{\NOT\equal{\tikznoc@split@behind}{}}{%
 %    \end{macrocode}
-% 
+%
 % If the separator specified by optional argument is part of second
 % argument, split the string at the first otikznoc@numtoid@colurrence.
 %    \begin{macrocode}
@@ -1448,7 +1474,7 @@
     \StrBehind{\tikznoc@split@behind}{#1}[\tikznoc@split@behind]%
   }{%
 %    \end{macrocode}
-% 
+%
 % If the separator is not found, store the input and set the iteration
 % string to the empty string.
 %    \begin{macrocode}
@@ -1456,7 +1482,7 @@
     \def\tikznoc@split@behind{}%
   }%
 %    \end{macrocode}
-% 
+%
 % For every extracted index, fill the node with the color provided by
 % the third argument. Also, reprint the number or index.
 %    \begin{macrocode}
@@ -1466,9 +1492,9 @@
 }%
 %    \end{macrocode}
 % \end{macro}
-% 
-% 
-% 
+%
+%
+%
 % Interface macro for 'draw at every router'.\\
 % Syntax: |\drawateveryrouter|\marg{COMMANDS}.
 % \begin{macro}{\drawateveryrouter}
@@ -1478,17 +1504,17 @@
 \def\tikznoc@draw@at@every@router{#2}}%
 %    \end{macrocode}
 % \end{macro}
-% 
-% 
+%
+%
 % Interface macro to draw something at one specific router.\\
 % Syntax: |\drawatrouter|\marg{RowColIdx}\marg{COMMANDS}
 % \begin{macro}{\drawateveryrouter}
-% This macro redefines the coordinate shortcuts for the current router 
+% This macro redefines the coordinate shortcuts for the current router
 % such that they can be used in the drawing commands.
 %    \begin{macrocode}
-\newcommand{\drawatrouter}[3][]{% 
+\newcommand{\drawatrouter}[3][]{%
 %    \end{macrocode}
-% 
+%
 % Redefine coordinates.
 %    \begin{macrocode}
 \path (r#2c)  coordinate(useC)%
@@ -1502,14 +1528,14 @@
   (r#2w)  coordinate(useW)%
 ;%
 %    \end{macrocode}
-% 
+%
 % Execute COMMAND and terminate macro.
 %    \begin{macrocode}
 {#3}}
 %    \end{macrocode}
 % \end{macro}
-% 
-% 
+%
+%
 % Macro to draw a tile at a router.\\
 % Syntax: |\tikznoctile|\oarg{tile style}\marg{router index}
 % \begin{macro}{\tikznoctile}
@@ -1522,16 +1548,16 @@
 }%
 %    \end{macrocode}
 % \end{macro}
-% 
-% 
+%
+%
 % Surround a NoC with partly links to indicate it is part of a bigger
 % NoC.\\
 % Syntax: |\tikznocembed|\oarg{}\marg{$r$}\marg{$c$}
-% \begin{macro}{\tikznoctikznocembed}
+% \begin{macro}{\tikznocembed}
 %    \begin{macrocode}
 \newcommand{\tikznocembed}[3][]{%
 %    \end{macrocode}
-% 
+%
 % Horizontal extensions.
 %    \begin{macrocode}
   \foreach \k in {1,...,#2} {%
@@ -1539,7 +1565,7 @@
     \draw (\k-1+0.25,-#3+1) -- ++(0,-0.25);
   }
 %    \end{macrocode}
-% 
+%
 % Vertical extensions.
 %    \begin{macrocode}
   \foreach \k in {1,...,#3} {%
@@ -1549,8 +1575,8 @@
 }
 %    \end{macrocode}
 % \end{macro}
-% 
-% 
+%
+%
 % Macro to connect two routers by a route.\\
 % Syntax: |\tikznocRoute|%
 % \oarg{route key-val}\oarg{tikz scope key-val}%
@@ -1695,7 +1721,7 @@
   below right%
 }[none]{\setkeys[tikznoc]{routeSink}{\val}}%
 %    \end{macrocode}
-% 
+%
 % Connection route macro.
 %    \begin{macrocode}
 \DeclareDocumentCommand{\tikznocRoute}{ o O{} m s o m s o }{%
@@ -1713,7 +1739,7 @@
 % Define alias coordinates for the routers used to connect.
 %    \begin{macrocode}
   \path (r#3c) ++ (\tikznoc@route@sourceoffset) coordinate (tikznocRouteFrom);%
-  \path (r#6c) ++ (\tikznoc@route@sinkoffset) coordinate (tikznocRouteTo);%  
+  \path (r#6c) ++ (\tikznoc@route@sinkoffset) coordinate (tikznocRouteTo);%
 %    \end{macrocode}
 % Define alias coordinates for the tiles based on the star options.
 % The star variants use the same offset for the tiles as for the routers.
@@ -1722,7 +1748,7 @@
   \path (t#3.center) ++ (\tikznoc@route@sourceoffset) coordinate (tikznocRouteFromTile);%
 }{}%
 \IfBooleanTF{#7}{%
-  \path (t#6.center) ++ (\tikznoc@route@sinkoffset) coordinate (tikznocRouteToTile);% 
+  \path (t#6.center) ++ (\tikznoc@route@sinkoffset) coordinate (tikznocRouteToTile);%
 }{}%
 %    \end{macrocode}
 % Switch between the three connection styles.  If star variant, make a straight
@@ -1746,8 +1772,8 @@
 }%
 %    \end{macrocode}
 % \end{macro}
-% 
-% 
+%
+%
 % Macro to connect two routers by a path specified by the hops.\\
 % Syntax: |\tikznocPath|%
 % \oarg{route key-val}\oarg{tikz scope key-val}%
@@ -1758,7 +1784,7 @@
 %    \begin{macrocode}
 \DeclareDocumentCommand{\tikznocPath}{ s s O{} m }{%
   \foreach \node [count=\K] in {#4} {};%
-  
+
   \foreach \node [count=\k] in {#4} {%
     \ifnum\k>1
       \IfBooleanTF{#2}{%
@@ -1780,19 +1806,19 @@
 }%
 %    \end{macrocode}
 % \end{macro}
-% 
-% 
+%
+%
 % MACRO TEMPLATE\\
 % Syntax: |\tikznoc|\oarg{}\marg{}
 % \begin{macro}{\tikznoc}
 %    \begin{macrocode}
 %    \end{macrocode}
 % \end{macro}
-% 
-% 
-% 
-% 
-% 
+%
+%
+%
+%
+%
 % \section{To Do}%
 % \begin{itemize}
 %   \item Maybe change the rectangle router generation using nodes
@@ -1800,53 +1826,53 @@
 %   \item Make the edge numbers more modular with options controlling their
 %     style
 % \end{itemize}
-% 
-% 
-% 
+%
+%
+%
 % \iffalse ins meta-comment
-% 
+%
 % For convenience, the corresponding .ins file is provided here.
 % Just copy this in a file called tikznoc.ins and run it through latex.
-% 
+%
 % %%
 % %% Copyright (C) 2014 by Michael Vonbun <m.vonbun@gmail.com>
-% %% 
+% %%
 % %% This file may be distributed and/or modified under the conditions of
 % %% the LaTeX Project Public License, either version 1.2 of this license
 % %% or (at your option) any later version.  The latest version of this
 % %% license is in:
-% %% 
+% %%
 % %%    http://www.latex-project.org/lppl.txt
-% %% 
+% %%
 % %% and version 1.2 or later is part of all distributions of LaTeX version
 % %% 1999/12/01 or later.
-% %% 
-% 
+% %%
+%
 % \input docstrip.tex
 % \keepsilent
-% 
+%
 % \usedir{tex/latex/lisstyles/tikznoc}
-% 
+%
 % \preamble
-% 
+%
 % This is a generated file.
-% 
+%
 % Copyright (C) 2014 by Michael Vonbun <m.vonbun@gmail.com>
-% 
+%
 % This file may be distributed and/or modified under the conditions of
 % the LaTeX Project Public License, either version 1.2 of this license
 % or (at your option) any later version.  The latest version of this
 % license is in:
-% 
+%
 %    http://www.latex-project.org/lppl.txt
-% 
+%
 % and version 1.2 or later is part of all distributions of LaTeX version
 % 1999/12/01 or later.
-% 
+%
 % \endpreamble
-% 
+%
 % \generate{\file{tikznoc.sty}{\from{tikznoc.dtx}{package}}}
-% 
+%
 % \obeyspaces
 % \Msg{*************************************************************}
 % \Msg{*                                                           *}
@@ -1867,13 +1893,13 @@
 % \Msg{* Happy TeXing!                                             *}
 % \Msg{*                                                           *}
 % \Msg{*************************************************************}
-% 
+%
 % \endbatchfile
-% 
+%
 % \fi
-% 
+%
 % \setcounter{IndexColumns}{2}
-% \Finale \PrintChanges \PrintIndex 
+% \Finale \PrintChanges \PrintIndex
 \endinput
 
 % \endinput
